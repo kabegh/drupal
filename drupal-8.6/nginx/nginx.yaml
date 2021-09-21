@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: drupal-test
+    tier: nginx
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: nginx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: drupal-test
+        tier: nginx
+    spec:
+      containers:
+      - image: <registry_path>/nginx:<tag>
+        name: nginx-container
+        ports:
+        - name: nginx-port
+          containerPort: 8080
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          readOnly: true
+          name: sites-conf-vol
+      volumes:
+      - name: sites-conf-vol
+        configMap:
+          name: sites-conf
+          items:
+            - key: sites.conf
+              path: sites.conf
+
